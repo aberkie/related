@@ -23,6 +23,21 @@ if (!$("#settings").length) {
 }
 
 if (id != null) {
+  // Remove previous list in sidebar to fix bug in CraftCMS v3.4
+  $('#related-widget').remove();
+  
+  // Set up sidebar widget and set to loading
+  $("#settings").append(
+    '<div id="related-widget" class="field" style="margin-top: 50px">' +
+      '<div class="heading">' +
+        '<label>Relations</label>' +
+      '</div>' +
+      '<div class="input ltr">' +
+        '<p>Loading...</p>' +
+      '</div>' +
+    '</div>'
+  );
+
   $.ajax({
     type: "GET",
     url: "/actions/related/default?id=" + id + "&sectionId=" + sectionId + "&userId=" + userId + "&categoryId=" + categoryId,
@@ -38,19 +53,9 @@ if (id != null) {
         resizable: true,
       });
 
-      // Remove previous list in sidebar to fix bug in CraftCMS v3.4
-      $('#related-widget').remove();
-
-      // Add link to sidebar
-      $("#settings").append(
-        '<div id="related-widget" class="field" style="margin-top: 50px">' +
-          '<div class="heading">' +
-            '<label>Relations</label>' +
-          '</div>' +
-          '<div class="input ltr">' +
-            '<a target="_blank" href="#">View (' + res.count + ')</a>' +
-          '</div>' +
-        '</div>'
+      // Add link and count to widget
+      $("#related-widget .input").html(
+        '<a target="_blank" href="#">View (' + res.count + ')</a>'
       );
 
       $('#related-widget a').click(function(e) {
@@ -63,6 +68,11 @@ if (id != null) {
         });
       });
     }
+  }).fail(function (res) {
+  // Dispaly error message
+  $("#related-widget .input").html(
+    '<p>There was an error fetching relations.</p>'
+  );
   });
 }
 
